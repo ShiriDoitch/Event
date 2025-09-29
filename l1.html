@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js'></script>
+    <title>Document</title>
+    <style>
+        button {
+            background-color: #4caf9d;
+            border: none;
+            color: white;
+            padding: 20px 40px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 20px;
+            margin: 10px 5px;
+            cursor: pointer;
+            border-radius: 12px;
+            transition-duration: 0.4s;
+        }
+
+        button:hover {
+            background-color: #459aa0;
+            box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+        }
+    </style>
+</head>
+
+<body>
+    <input type="text" id="id" placeholder="Event ID" />
+    <input type="text" id="title" placeholder="Event Title" />
+    <input type="date" id="date" placeholder="Event Date" />
+
+    <button id="post">Add Event</button>
+    <button id="delete">Delete Event</button>
+
+    <div id='calendar'></div>
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+            axios.get("https://localhost:7020/api/Events").then((res) => {
+                var calendarEl = document.getElementById("calendar");
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: "dayGridMonth",
+                    events: res.data,
+                });
+                calendar.render();
+            });
+        });
+
+        document.querySelector('#post').addEventListener('click', AddEvent);
+        document.querySelector('#delete').addEventListener('click', DeleteEvent);
+
+        function AddEvent() {
+            const eventId = document.querySelector('#id').value;
+            const eventTitle = document.querySelector('#title').value;
+            const eventDate = document.querySelector('#date').value;
+
+            axios.post('https://localhost:7020/api/Events', { id: eventId, title: eventTitle, date: eventDate }).then((res) => {
+                alert("Your event has been added!");
+                location.reload();
+            })
+        }
+
+        function DeleteEvent() {
+            const eventId = document.querySelector('#id').value;
+            axios.delete(`https://localhost:7020/api/Events/${eventId}`).then((res) => {
+                alert("Your event has been deleted!");
+                location.reload();
+
+            })
+        }
+    </script>
+</body>
+
+</html>
